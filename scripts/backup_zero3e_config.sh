@@ -26,7 +26,13 @@ fetch /etc/netplan/20-end1-static.yaml sudo
 fetch /etc/systemd/system/zero3e-temp.service
 fetch /etc/systemd/system/zero3e-temp.timer
 fetch /usr/local/bin/zero3e-temp
-# 手動インストールしたパッケージ、OS/カーネル情報
-"${SSH[@]}" 'apt-mark showmanual | sort' > "$DEST/apt-manual-packages.txt" && echo "OK: apt-mark showmanual"
-"${SSH[@]}" 'echo "kernel: $(uname -r)"; grep PRETTY_NAME /etc/os-release; dpkg-query -W soapyremote-server soapysdr-tools soapysdr-module-hackrf soapysdr-module-rtlsdr hackrf rtl-sdr avahi-daemon iperf3' > "$DEST/versions.txt" && echo "OK: versions"
+# 手動インストールしたパッケージ、保留(hold)、OS/カーネル情報（接続失敗時に既存ファイルを空にしない）
+save() {  # save <出力ファイル名> <ZERO 3E で実行するコマンド>
+  local out="$DEST/$1" tmp; tmp="$(mktemp)"
+  if "${SSH[@]}" "$2" > "$tmp" 2>/dev/null && [[ -s "$tmp" ]]; then mv "$tmp" "$out"; echo "OK: $1"
+  else rm -f "$tmp"; echo "SKIP (取得失敗。既存のコピーは保持): $1"; fi
+}
+save apt-manual-packages.txt 'apt-mark showmanual | sort'
+save apt-holds.txt 'apt-mark showhold | sort'
+save versions.txt 'echo "kernel: $(uname -r)"; grep PRETTY_NAME /etc/os-release; echo "hostname: $(hostname)"; echo "timezone: $(timedatectl show -p Timezone --value)"; dpkg-query -W soapyremote-server soapysdr-tools soapysdr-module-hackrf soapysdr-module-rtlsdr hackrf rtl-sdr avahi-daemon iperf3'
 echo "保存先: $DEST"

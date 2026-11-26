@@ -79,3 +79,35 @@ ZERO 3E 側のサーバー構築と、FBSAT59 からの接続確認までを行�
 - ネットワーク設定を変えるときは、切断に備えて元に戻す手順を先に示すこと。
 - githubのJF9SOMアカウントにもレポジトリを構築し、commit後には、pushすること。 
 - 1フェーズずつ進め、各フェーズの終わりに結果と次の手順を短くまとめること。
+
+## 作業状況（2026-11-26 時点。詳細は各 docs を参照）
+上の「これまでの検討結果」「作業フェーズ（案）」は計画時の記述。実施結果は次のとおり（確認済みは docs にコマンド出力ベースで記載）。
+
+| フェーズ | 結果 | 記録 |
+|---|---|---|
+| 0 Armbian 書き込み | 完了（trixie vendor 6.1.115 Minimal。dd は 3 回目で成功） | [docs/phase0.md](docs/phase0.md) |
+| 1 基本設定 | 完了（鍵認証のみ・root 禁止、タイムゾーン Asia/Tokyo、固定 IP）。時刻同期は NTP なしのまま運用と決定 | [docs/phase1-3-progress.md](docs/phase1-3-progress.md)、[docs/network.md](docs/network.md)、[docs/time-sync.md](docs/time-sync.md) |
+| 2 HackRF 認識 | 完了（PortaPack 装着。USB 実測 0.85〜0.88 A / 約 4.86 V＝計画時の 500 mA 想定を超えるが動作） | [docs/phase2.md](docs/phase2.md) |
+| 3 SoapyRemote | 完了（同梱 systemd ユニットを使用。自動起動・異常終了後の再起動・抜き差しを確認） | [docs/phase3.md](docs/phase3.md) |
+| 4 Mac / FBSAT59 接続 | 完了（FBSAT59 の注意点あり） | [docs/phase4.md](docs/phase4.md) |
+| 5 性能 | 完了（CS8/UDP で 16 Msps まで取りこぼしなし、18 Msps 以上は不足） | [docs/phase5.md](docs/phase5.md) |
+| 6 運用 | 完了（温度監視タイマー、設定バックアップ） | [docs/phase6.md](docs/phase6.md) |
+| 追加 | バイアスT（LaNA WB）、`apt upgrade`（カーネル関連 5 件は保留）、PoE の検討 | [docs/bias-t.md](docs/bias-t.md)、[docs/apt-upgrade.md](docs/apt-upgrade.md)、[docs/poe.md](docs/poe.md) |
+
+### 計画時の「要確認」の結論
+- CS8 転送: 帯域の実測から CS8 で流れていると判断（remote:format=CS8 指定でも確認）。FBSAT59 側の指定の有無はログ未確認
+- バージョン互換: FBSAT59 同梱 SoapySDR 0.8.1-5 / SoapyRemote 0.5.2 とサーバー側 0.8.1-5+b2 / 0.5.2-4 で問題なし
+- ファイアウォール: Armbian には ufw/nft/iptables が未導入（制限なし）。mDNS（avahi）は動作
+- 電源（USB）: 上記のとおり。**PoE は未実施**（PSE 未購入。条件整理のみ）
+
+### 現在の構成と運用上の注意
+- ZERO 3E: 192.168.50.2/24（Mac 直結、ゲートウェイなし）。`ssh jf9som@192.168.50.2`（鍵認証）。Mac 側 AX88179A は 192.168.50.1/24 手入力
+- 電源を切る前に `sudo poweroff`（`ext4 commit=120`）。RTC は電池なしで電源断で初期化される（時刻は電源断時間ぶん遅れる）
+- インターネット共有（apt 等）は一時的にオン→作業後オフ。オフ直後に Mac の `en6` に IPv4 が付かないときは `networksetup -setnetworkserviceenabled AX88179A off/on`
+- FBSAT59: 「Remote SDR自動検索を有効にする」オン＋デスクトップの FBSAT59.app から起動し直す（アプリ内再起動は不可）。リモート HackRF のバイアスT 切替の不具合は FBSAT59 側を修正済み（FBSAT59 リポジトリ `b6e0feb`）
+- カーネル関連 5 件は `apt-mark hold` 中（`config/zero3e/apt-holds.txt`）。更新前に SD イメージのバックアップを推奨
+
+### バックアップ（GitHub）
+- `config/zero3e/`: 設定ファイル、温度監視一式、apt 手動パッケージ・保留・バージョン一覧。`scripts/backup_zero3e_config.sh` で更新（失敗時は既存コピーを保持）
+- **対象外**: SSH 秘密鍵・ホスト鍵・パスワード、SSH の `authorized_keys`（復元は `ssh-copy-id`）、microSD のイメージ、netplan（root 専用のため手元のコピーを手動維持）、FBSAT59 のデータベース（`fbsat59.db`。FBSAT59 のソースは別リポジトリ）
+- 復元手順の自動化は未実施。再構築は docs の手順＋`config/` のファイルで行う

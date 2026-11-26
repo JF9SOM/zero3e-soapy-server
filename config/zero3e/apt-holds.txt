@@ -1,0 +1,5 @@
+armbian-firmware
+linux-dtb-vendor-rk35xx
+linux-headers-vendor-rk35xx
+linux-image-vendor-rk35xx
+linux-u-boot-radxa-zero3-vendor
