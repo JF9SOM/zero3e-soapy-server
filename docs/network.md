@@ -33,3 +33,9 @@ network:
 ## 注意・未解決
 - インターネット（NTP）がない間は `System clock synchronized: no`。時刻ずれの影響は未確認（FBSAT59 のタイムスタンプ等）。対策案: 定期的にインターネット共有で同期 / Mac を NTP 源にする（未検討）
 - `apt upgrade`（93 パッケージ、カーネル含む）は、インターネット共有をオンにして行う（未実施）
+
+## FBSAT59 の接続先変更（2026-11-26）
+- 固定 IP 構成（192.168.50.2）で FBSAT59 からの受信（3.2 MHz、スペクトラム表示）を確認。ログ: `SDR opened: HackRF One #0 …` → `SDRPipeline started (rate=3200000 Hz)`、エラーなし
+- FBSAT59 の接続先は DB（`~/Library/Application Support/fbsat59/fbsat59.db` の `app_settings` の `sdr_settings`）に保存される。GUI なら SDR設定で「リモートホストを追加…」（旧ホストは「削除」）
+  - 今回は FBSAT59 終了中に DB を直接更新（`device_args.remote` と `remote_hosts[0].host`）。バックアップ: 同フォルダの `fbsat59.db.bak-20261126`
+- FBSAT59 の注意（フェーズ 4 参照）: 「Remote SDR自動検索を有効にする」オン＋アプリ終了後にデスクトップの FBSAT59.app から起動し直すこと（アプリ内再起動では `SOAPY_SDR_PLUGIN_PATH` が残る）
