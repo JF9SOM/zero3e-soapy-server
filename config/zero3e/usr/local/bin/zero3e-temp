@@ -1,5 +1,4 @@
 #!/bin/sh
-# 温度と CPU 周波数をジャーナルに記録する。SoC が 70°C 以上なら警告。
 t=$(cat /sys/class/thermal/thermal_zone0/temp)
 g=$(cat /sys/class/thermal/thermal_zone1/temp)
 f=$(cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq)
