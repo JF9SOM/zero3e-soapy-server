@@ -20,7 +20,7 @@ HackRF は USB 3.0 ポートに接続（PortaPack Mayhem 装着、実測 0.85〜
 ## SoapyRemote ストリーム試験（`scripts/rx_test.py`、Mac の radioconda Python + SoapySDR 0.8.1-6 / remote 0.5.2）
 | レート | 形式 | プロトコル | 実効レート | overflow | 備考 |
 |---|---|---|---|---|---|
-| 10 Msps | CS8 | UDP | 9.993 Msps | 0 | 送信 168 Mbps、サーバー CPU 約 50 %、50.0°C は 20M 時 |
+| 10 Msps | CS8 | UDP | 9.993 Msps | 0 | 送信 168 Mbps、サーバー CPU 約 50 %、温度 48.3°C |
 | 12 Msps | CS8 | UDP | 11.987 Msps | 0 | |
 | 16 Msps | CS8 | UDP | 15.991 Msps | 0 | |
 | 18 Msps | CS8 | UDP | 17.768 Msps | 12 | 約 1.3 % 不足 |
