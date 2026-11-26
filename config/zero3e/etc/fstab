@@ -1,0 +1,2 @@
+UUID=2bae8c0f-7897-4388-a83a-f7f375d59dd1 / ext4 defaults,commit=120,errors=remount-ro 0 1
+tmpfs /tmp tmpfs defaults,nosuid 0 0

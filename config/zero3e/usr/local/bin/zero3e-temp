@@ -1,0 +1,11 @@
+#!/bin/sh
+# 温度と CPU 周波数をジャーナルに記録する。SoC が 70°C 以上なら警告。
+t=$(cat /sys/class/thermal/thermal_zone0/temp)
+g=$(cat /sys/class/thermal/thermal_zone1/temp)
+f=$(cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq)
+msg="soc=$((t/1000))C gpu=$((g/1000))C cpu0=$((f/1000))MHz"
+if [ "$t" -ge 70000 ]; then
+  logger -t zero3e-temp -p user.warning "WARNING $msg"
+else
+  logger -t zero3e-temp -p user.info "$msg"
+fi

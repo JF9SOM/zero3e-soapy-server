@@ -1,0 +1,6 @@
+[Unit]
+Description=Log ZERO 3E temperature to the journal
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/zero3e-temp
