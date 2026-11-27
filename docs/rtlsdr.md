@@ -20,7 +20,9 @@
 - ZERO 3E 上で `rtl_test -s 2048000` を約 6 秒実行したところ、「lost at least …」が数回出た（損失 100 万サンプルあたり最小 266）。SoapyRemote 経由ではない直接試験。連続受信での影響は**未確認**。
 - `rtl_test -t` の「No E4000 tuner found」「PLL not locked」は E4000 用試験オプションの結果で、故障ではない。
 
+## バイアスT
+- 使用中の RTL-SDR はバイアスT 非対応（ユーザー申告）のため、バイアスT の確認は不要。
+
 ## 未確認
-- RTL-SDR のバイアスT（FBSAT59 の `biastee` 切替）の実機動作
 - 長時間受信での取りこぼし、RTL-SDR の消費電流の実測
 - 試験用スクリプトは、`scripts/rx_test.py` の接続先を `192.168.50.2`、`remote:driver=rtlsdr` に変えた一時コピーで実施（リポジトリ内の `rx_test.py` は HackRF・旧 IP 固定のまま）
