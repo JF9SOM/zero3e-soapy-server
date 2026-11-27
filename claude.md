@@ -93,6 +93,7 @@ ZERO 3E 側のサーバー構築と、FBSAT59 からの接続確認までを行�
 | 5 性能 | 完了（CS8/UDP で 16 Msps まで取りこぼしなし、18 Msps 以上は不足） | [docs/phase5.md](docs/phase5.md) |
 | 6 運用 | 完了（温度監視タイマー、設定バックアップ） | [docs/phase6.md](docs/phase6.md) |
 | 追加 | バイアスT（LaNA WB）、`apt upgrade`（カーネル関連 5 件は保留）、PoE の検討 | [docs/bias-t.md](docs/bias-t.md)、[docs/apt-upgrade.md](docs/apt-upgrade.md)、[docs/poe.md](docs/poe.md) |
+| 追加（11/27） | RTL-SDR 併用（差し替え式、設定変更なしで自動認識、FBSAT59 で確認） | [docs/rtlsdr.md](docs/rtlsdr.md) |
 
 ### 計画時の「要確認」の結論
 - CS8 転送: 帯域の実測から CS8 で流れていると判断（remote:format=CS8 指定でも確認）。FBSAT59 側の指定の有無はログ未確認
