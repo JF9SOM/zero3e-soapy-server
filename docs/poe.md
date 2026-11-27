@@ -69,3 +69,21 @@
 - 公式資料に記載なし → **可否は未確認**。PoE の電気が来なければ HAT の電源回路は止まる見込み（推測）だが、USB-C の 5V が HAT 側へ回り込むかは回路図がないと判断できない
 - 方針: PoE を使わない間は、銅ポストを外す（PoE 経路を切る）か、HAT ごと外す。**PoE と USB-C の同時接続は禁止**（上記と同じ）
 - 回路図の確認候補: ZERO 3E 本体の回路図（上記 PDF）で 40 ピン 2/4 番（5V）の扱いを確認、または Radxa フォーラム（https://forum.radxa.com/）で質問
+
+## 試験結果（2026-11-27）: PoE インジェクター（Premiertek PT-POE-G4850W）＋ Radxa PoE HAT
+構成: Mac(AX88179A) → インジェクター DATA → インジェクター POWER+DATA → ZERO 3E（PoE HAT、USB-C 電源は外して PoE のみ）、HackRF＋PortaPack 接続。
+
+確認済み:
+- **PoE のみで起動**（`uptime` で起動直後を確認）。SSH 可、`end1` は 1000 Mbps / full。HackRF One を `lsusb` で認識、`soapyremote-server` は稼働。
+- 電源まわりの異常ログ（低電圧・USB 過電流・USB リセットの繰り返し）なし。起動時の `aicbsp`（Bluetooth）失敗は PoE 以前の起動にもあり、電源とは無関係。
+- 電流計（HackRF 側）: 電圧 **4.88 V**（USB-C 時は約 4.86 V）。電流は初め約 0.67 A。
+- FBSAT59 から HackRF に接続して**受信できた。バイアスT も動作した**（ユーザー確認）。受信中の CPU 温度 約 40.6°C、SoapySDRServer の CPU 約 8 %（確認時点）。
+
+分かったこと:
+- 0.67 A は、`dmesg` の USB ID から、**PortaPack が Mayhem モード（1d50:6018）で起動した状態**だった可能性が高い（その後 HackRF モード 1d50:6089 に切替わり再接続。ログ上の事実）。0.67 A を測った時点のモードは未確認。
+- 「FAIL: SoapyRPCUnpacker::recv(header)」は、クライアント切断時のログと見られる（未確認）。
+
+未確認:
+- インジェクターがアクティブ式かパッシブ式か（起動した事実のみ。出力電圧・ピンは未測定）
+- 受信中の電流値（数値の記録なし）、長時間（20 分以上）の連続受信、高レート（10 Msps 超）での 5V 余裕
+- 「PoE なしの LAN ケーブル＋USB-C 電源」での併用可否・逆流防止（引き続き未確認。PoE と USB-C の同時接続は禁止のまま）
