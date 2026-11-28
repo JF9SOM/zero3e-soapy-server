@@ -49,3 +49,12 @@ ZERO 3E 側（192.168.50.2/24 固定、DHCP なし）は Mac に依存しない�
 - 最初は接続できなかった。原因は FBSAT59 のログ上、Remote モジュールを除外した `soapy_modules_no_remote` が使われていたこと（`SoapySDR::Device::make() no match`）。**「Remote SDR 自動検索を有効にする」をオン → FBSAT59 を完全終了 → ショートカットから起動し直し**で解決（Mac と同じ）。
 
 未確認: GPD の Linux（Ubuntu）からの接続。手順は、Ubuntu の設定 → Network → Wired の「+」で IPv4 を Manual（192.168.50.1 / 255.255.255.0、ゲートウェイ空欄）にする。
+
+## 追記（2026-11-28）: Windows PC の SSH 公開鍵を ZERO 3E に追加
+- 目的: Windows PC から `ssh jf9som@192.168.50.2` で入れるようにする（ZERO 3E は鍵認証のみのため、鍵がないと `Permission denied (publickey)`）。
+- Windows（`FUJITSU`、`ssh windev` で入れる PC）に、ed25519 の鍵を新規作成（`C:\Users\pc\.ssh\id_ed25519`、**パスフレーズなし**、コメント `windows-fujitsu-to-zero3e`）。
+- 公開鍵（フィンガープリント `SHA256:hOOwey1vW7JfWV/hNJZWoIDlleJxq431xVwsdgkPMj4`）を、ZERO 3E の `~/.ssh/authorized_keys` に 1 行追加（権限 600 のまま。登録は Mac と Windows の 2 本）。
+- 追加の方法: ZERO 3E が Windows 直結で Mac から届かなかったため、**Windows を中継**して Mac の鍵で入り追記した（`ssh -J windev jf9som@192.168.50.2`）。ケーブルの付け替えは不要だった。
+- 確認済み: Windows から `ssh jf9som@192.168.50.2 hostname` が成功（`radxa-zero3`）。初回接続で ZERO 3E のホスト鍵が Windows の `known_hosts` に登録された。
+- 注意: 鍵にパスフレーズがないため、Windows の `pc` アカウントに入れる人は ZERO 3E にも入れる。使えなくするには、`authorized_keys` の `windows-fujitsu-to-zero3e` の行を削除する。
+- バックアップ対象外: `authorized_keys` は GitHub のバックアップ対象外（復元は `ssh-copy-id` や上の方法で再登録）。公開鍵はこの文書の上記フィンガープリントで照合できる。秘密鍵はこのリポジトリに含めない。
