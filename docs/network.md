@@ -39,3 +39,13 @@ network:
 - FBSAT59 の接続先は DB（`~/Library/Application Support/fbsat59/fbsat59.db` の `app_settings` の `sdr_settings`）に保存される。GUI なら SDR設定で「リモートホストを追加…」（旧ホストは「削除」）
   - 今回は FBSAT59 終了中に DB を直接更新（`device_args.remote` と `remote_hosts[0].host`）。バックアップ: 同フォルダの `fbsat59.db.bak-20261126`
 - FBSAT59 の注意（フェーズ 4 参照）: 「Remote SDR自動検索を有効にする」オン＋アプリ終了後にデスクトップの FBSAT59.app から起動し直すこと（アプリ内再起動では `SOAPY_SDR_PLUGIN_PATH` が残る）
+
+## 追記（2026-11-28）: Mac 以外の PC から接続する
+ZERO 3E 側（192.168.50.2/24 固定、DHCP なし）は Mac に依存しない。クライアント PC の有線 LAN を手動で `192.168.50.x/24`（例 192.168.50.1、ゲートウェイ・DNS は空欄）にすれば接続できる。Wi-Fi（192.168.3.x）とは範囲が重ならず、インターネットは Wi-Fi 側を使い続けられる。
+
+確認済み（Windows 11 PC、FBSAT59 インストール版同梱の SoapySDR を使用）:
+- 有線 LAN を `192.168.50.1/24`（ゲートウェイ空欄）に設定、`Test-NetConnection 192.168.50.2 -Port 55132` が成功。Windows ファイアウォールの追加設定は不要だった（今回の構成で）。
+- FBSAT59 から HackRF に接続でき、動作を確認（ユーザー確認）。
+- 最初は接続できなかった。原因は FBSAT59 のログ上、Remote モジュールを除外した `soapy_modules_no_remote` が使われていたこと（`SoapySDR::Device::make() no match`）。**「Remote SDR 自動検索を有効にする」をオン → FBSAT59 を完全終了 → ショートカットから起動し直し**で解決（Mac と同じ）。
+
+未確認: GPD の Linux（Ubuntu）からの接続。手順は、Ubuntu の設定 → Network → Wired の「+」で IPv4 を Manual（192.168.50.1 / 255.255.255.0、ゲートウェイ空欄）にする。
